@@ -1,0 +1,51 @@
+---
+ #package
+ #file
+ #service
+#ansible -i hosts remote -m ping
+#ansible -i hosts all -m apt -a "name=tree state=latest"
+#ansible -i hosts remote -m apt_repository -a "repo=ppa:nginx/stable"
+- hosts: remote
+  vars:
+    packagename: nginx
+  tasks:
+  - name: set apt repo
+    apt_repository:
+      repo: ppa:nginx/stable
+  - name: install nginx
+    apt:
+      name: "{{ packagename }}"
+      state: latest  
+  - name: create a tutorial dir
+    file:
+      name: /var/www/tutorial
+      state: directory    
+  - name: copy index.html file
+    copy:
+      src: index.html
+      dest: /var/www/tutorial/  
+    notify: restart nginx service    
+  - name: create a sites-enabled dir
+    file:
+      name: /etc/nginx/sites-enabled
+      state: directory    
+  - name: copy conf file
+    copy:
+      src: tutorial
+      dest: /etc/nginx/sites-available/tutorial
+  - name: create a sites-enabled dir
+    file:
+      src: /etc/nginx/sites-available/tutorial
+      dest: /etc/nginx/sites-enabled/default
+      state: link     
+    notify: restart nginx service     
+  - name: start the service
+    service:
+      name: "{{ packagename }}"
+      state: started    
+  handlers:
+  - name: restart nginx service 
+    service:
+      name: "{{ packagename }}"
+      state: restarted 
+
