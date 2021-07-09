@@ -1,0 +1,17 @@
+all:
+  hosts:
+    localhost:
+      ansible_connection: local
+  children:
+    webservers:
+      hosts:
+        ip-172-31-34-213.ap-south-1.compute.internal:
+      vars:
+        packagename: nginx
+    dbservers:
+      hosts:
+        one.example.com:
+        two.example.com:
+        three.example.com:
+
+
